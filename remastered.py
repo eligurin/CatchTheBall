@@ -39,6 +39,10 @@ COLORS = [RED, BLUE, YELLOW, GREEN, MAGENTA, CYAN]
 
 
 def read_records():
+    """
+    Функция считывает таблицу рекордов в списки
+    :return:
+    """
     names = open('records_names', 'r')
     scores = open('records_scores', 'r')
     r_1 = names.readlines()
@@ -52,12 +56,19 @@ def read_records():
 
 class Ball:
     def __init__(self):
+        """
+        Функция-конструктор объекта класса шариков
+        """
         self.r = randint(30, 50)
         (self.x, self.y) = (randint(self.r, WIDTH - self.r), randint(self.r, HEIGHT - self.r))
         (self.dx, self.dy) = (randint(-5, 5), randint(-5, 5))
         self.color = COLORS[randint(0, 5)]
 
     def movement(self):
+        """
+        Функция рисует положение шарика на текущем кадре
+        :return:
+        """
         if not WIDTH - self.r > self.x + self.dx > self.r:
             self.dx = - self.dx
         if not HEIGHT - self.r > self.y + self.dy > self.r:
@@ -67,6 +78,12 @@ class Ball:
         circle(screen, self.color, (self.x, self.y), self.r)
 
     def score(self, event, i):
+        """
+        Функция проверяет попадание по шарику для каждого нажатия мыши, в случае попадания удаляет шарик
+        :param event: нажатие на кнопку мыши
+        :param i: номер шарика в списке шариков
+        :return:
+        """
         global score
         (x_click, y_click) = event.pos
         if (x_click-self.x)**2 + (y_click-self.y)**2 <= self.r**2:
@@ -76,6 +93,9 @@ class Ball:
 
 class Square:
     def __init__(self):
+        """
+        Функция-конструктор объекта класса квадратов
+        """
         self.r = randint(30, 50)
         (self.x, self.y) = (randint(self.r, WIDTH - self.r), randint(self.r, HEIGHT - self.r))
         (self.dx, self.dy) = (randint(-5, 5), randint(-5, 5))
@@ -83,6 +103,10 @@ class Square:
         self.teleport_time = randint(60, 90)
 
     def movement(self):
+        """
+        Функция рисует положение квадрата на текущем кадре
+        :return:
+        """
         if not WIDTH - self.r > self.x + self.dx > self.r:
             self.dx = - self.dx
         if not HEIGHT - self.r > self.y + self.dy > self.r:
@@ -92,10 +116,20 @@ class Square:
         rect(screen, self.color, (self.x - self.r, self.y - self.r, 2*self.r, 2*self.r))
 
     def teleport(self):
+        """
+        Функция телепортирует квадрат в случайное место на игровом поле
+        :return:
+        """
         if tick_count % self.teleport_time == 0:
             (self.x, self.y) = (randint(self.r, WIDTH - self.r), randint(self.r, HEIGHT - self.r))
 
     def score(self, event, i):
+        """
+        Функция проверяет попадание по квадрату для каждого нажатия мыши, в случае попадания удаляет квадрат
+        :param event: нажатие на кнопку мыши
+        :param i: номер квадрата в списке квадратов
+        :return:
+        """
         global score
         (x_click, y_click) = event.pos
         if self.x - self.r <= x_click <= self.x + self.r and self.y - self.r <= y_click <= self.y + self.r:
@@ -104,6 +138,10 @@ class Square:
 
 
 def text():
+    """
+    Функция отображает имя игрока, текущий счёт и оставшееся время на игровой панели
+    :return:
+    """
     screen.blit(pygame.font.Font(None, FONT_SIZE).render('Игрок:'
                                                          + name
                                                          + 'Текущий счёт:'
@@ -114,6 +152,10 @@ def text():
 
 
 def end_game():
+    """
+    Останавливает игру после истечения времени max_time, записывает результат, если он попал в десятку лучших
+    :return:
+    """
     global score
     w = open('records', 'w')
     w_1 = open('records_scores', 'w')
@@ -138,14 +180,17 @@ pygame.display.update()
 clock = pygame.time.Clock()
 finished = False
 
+# Открываем таблицу рекордов
 read_records()
 
 while not finished:
     clock.tick(FPS)
     tick_count += 1
+    # Проверка условия окончания игры
     if tick_count == FPS * max_time:
         end_game()
         finished = True
+    # Появление новых шариков и квадратов
     if tick_count % ball_time == 0 and len(balls) < max_balls:
         balls.append(Ball())
     if tick_count % square_time == 0 and len(squares) < max_squares:
@@ -168,5 +213,4 @@ while not finished:
     screen.fill(BLACK)
 
 
-print(score)
 pygame.quit()
